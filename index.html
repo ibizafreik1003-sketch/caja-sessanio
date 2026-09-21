@@ -268,7 +268,7 @@ function periodos(mes,f){return f==='quincenal'?[{id:mes+'-Q1',l:'1ª quincena'}
 function vNomina(){
   var t=hoy(),lun=addDays(mondayOf(t),S.week*7),dom=addDays(lun,6);
   var h='<div class="weeknav"><button class="btn sm" data-act="week" data-d="-1" aria-label="Semana anterior">‹</button><div class="lbl">'+esc(fDia(lun))+' – '+esc(fDia(dom))+(S.week===0?' <span class="pill today">esta semana</span>':'')+'</div><button class="btn sm" data-act="week" data-d="1" aria-label="Semana siguiente">›</button></div>';
-  h+='<div class="sec"><h2>Pagos de la semana</h2></div><div class="list">'+S.cfg.semana.slice().sort(function(a,b){return a.dia-b.dia}).map(function(p){return pagoRow(addDays(lun,p.dia-1),p,t)}).join('')+'</div>';
+  h+='<div class="sec"><h2>Pagos de la semana</h2><button class="btn sm" data-act="edit-plan">✎ Editar / agregar</button></div><div class="list">'+S.cfg.semana.slice().sort(function(a,b){return a.dia-b.dia}).map(function(p){return pagoRow(addDays(lun,p.dia-1),p,t)}).join('')+'</div>';
   var mes=mesDe(addDays(lun,3));
   h+='<div class="sec"><h2>Nómina fija · '+esc(mesLbl(mes))+'</h2></div><div class="list">'+S.cfg.fijos.map(function(f){
     var per=periodos(mes,f.frecuencia);
@@ -370,6 +370,24 @@ function undoPago(id){
   var pg=S.pagos[id];if(!pg)return;
   (pg.movId?removeMov(pg.movId):Promise.resolve()).then(function(){return removePago(id)});
 }
+var IT=-1;
+function openPlan(){
+  var items=S.cfg.semana.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){return a.p.dia-b.p.dia});
+  sheet('<h3>Pagos de la semana</h3><p class="hint" style="margin:-6px 0 12px">Se repiten cada semana en el día elegido.</p><div class="list">'+(items.length?items.map(function(o){return '<div class="row"><div class="main"><div class="t">'+esc(o.p.nombre)+'</div><div class="s">'+esc(DIAS[o.p.dia])+' · '+(o.p.tipo==='compras'?'Compras':'Nómina')+' · '+(o.p.monto?money(o.p.monto):'monto por definir')+'</div></div><button class="btn sm" data-act="edit-item" data-i="'+o.i+'">Editar</button></div>'}).join(''):'<div class="empty">Sin pagos.</div>')+'</div><button class="btn pri" style="width:100%;margin-top:12px" data-act="edit-item" data-i="new">+ Agregar pago</button>');
+}
+function openItem(i){
+  var nuevo=(i==='new'),p=nuevo?{dia:1,nombre:'',tipo:'compras',monto:0}:S.cfg.semana[Number(i)];
+  IT=nuevo?-1:Number(i);
+  sheet('<h3>'+(nuevo?'Nuevo pago':'Editar pago')+'</h3><div class="f"><label for="i-nombre">Nombre</label><input id="i-nombre" value="'+esc(p.nombre)+'" placeholder="Leche, Huevos, Hielo…"></div><div class="f2"><div class="f"><label for="i-dia">Día</label><select id="i-dia">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(d===p.dia?' selected':'')+'>'+esc(DIAS[d])+'</option>'}).join('')+'</select></div><div class="f"><label for="i-monto">Monto</label><input id="i-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div><div class="f"><label for="i-tipo">Tipo</label><select id="i-tipo"><option value="compras"'+(p.tipo==='compras'?' selected':'')+'>Compras del negocio</option><option value="nomina"'+(p.tipo==='nomina'?' selected':'')+'>Nómina</option></select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-item" style="width:100%">Guardar</button>'+(nuevo?'':'<button class="btn" data-act="ask-del-item" style="width:100%;margin-top:8px">Eliminar</button>')+'<button class="btn" data-act="edit-plan" style="width:100%;margin-top:8px">Volver</button>');
+}
+function saveItem(){
+  var n=$('i-nombre').value.trim(),err=$('errline');if(!n){err.textContent='Escribe el nombre.';return}
+  var v=parseMonto($('i-monto').value);
+  var o={nombre:n,dia:Number($('i-dia').value),tipo:$('i-tipo').value,monto:isNaN(v)?0:v};
+  if(IT<0){o.key='x'+Date.now().toString(36);S.cfg.semana.push(o)}
+  else{var p=S.cfg.semana[IT];p.nombre=o.nombre;p.dia=o.dia;p.tipo=o.tipo;p.monto=o.monto}
+  saveCfg().then(function(){render();openPlan()});
+}
 function ajustar(){
   var b=$('aj-b').value,real=parseMonto($('aj-v').value),err=$('errline');
   if(isNaN(real)){err.textContent='Escribe el saldo real.';return}
@@ -408,6 +426,11 @@ document.addEventListener('click',function(e){
   else if(a==='del-mov'){var m=S.movs.filter(function(x){return x.id===d.id})[0];S.pendDel=null;
     removeMov(d.id).then(function(){if(m&&m.pagoId&&S.pagos[m.pagoId])return removePago(m.pagoId)})}
   else if(a==='ajustar')ajustar();
+  else if(a==='edit-plan')openPlan();
+  else if(a==='edit-item')openItem(d.i);
+  else if(a==='save-item')saveItem();
+  else if(a==='ask-del-item'){el.textContent='Toca otra vez para eliminar';el.dataset.act='del-item'}
+  else if(a==='del-item'){S.cfg.semana.splice(IT,1);saveCfg().then(function(){render();openPlan()})}
 });
 document.addEventListener('change',function(e){
   var el=e.target,c=el.dataset.chg;
