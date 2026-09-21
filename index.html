@@ -34,6 +34,11 @@ button,input,select,textarea{font:inherit;color:inherit}
 .total small{opacity:.8;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .total .big{font-size:32px;font-weight:600;margin-top:2px}
 .total .sub{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:13px;opacity:.92}
+.totals2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.totals2 .total.alt{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.totals2 .total.alt small{opacity:.6}
+.totals2 .big{font-size:24px}
+@media (max-width:420px){.totals2{grid-template-columns:1fr}}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
 .bol{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
 .bol .n{font-size:12px;color:var(--mute)}
@@ -208,8 +213,8 @@ function sortedMovs(){return S.movs.slice().sort(function(a,b){return (b.fecha+(
 
 function vHoy(){
   var s=saldos(),libre=s.caja+s.bold+s.transf,apart=s.arriendo+s.servicios+s.propinas;
-  var h='<div class="total"><small>Negocio · Sessanio</small><div class="big mono">'+money(libre+apart)+'</div>'+
-    '<div class="sub"><span>Libre <b class="mono">'+money(libre)+'</b></span><span>Apartado en alcancías <b class="mono">'+money(apart)+'</b></span></div></div>';
+  var h='<div class="totals2"><div class="total"><small>Disponible (caja+bold+transf)</small><div class="big mono">'+money(libre)+'</div></div>'+
+    '<div class="total alt"><small>Guardado en alcancías</small><div class="big mono">'+money(apart)+'</div></div></div>';
   h+='<div class="sec"><h2>Dónde está la plata</h2></div><div class="grid">'+['caja','bold','transf'].map(function(k){return balCard(k,s)}).join('')+'</div>';
   h+='<div class="sec"><h2>Alcancías</h2></div><div class="grid">'+['arriendo','servicios','propinas'].map(function(k){return balCard(k,s)}).join('')+'</div>';
   h+='<div class="sec"><h2>Registrar</h2></div><div class="actions">'+
