@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0E6B58"><title>Caja Sessanio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F2F4F0;--surface:#FFFFFF;--ink:#15221F;--mute:#5E6D68;--line:#D9DFD9;
+  --accent:#0E6B58;--accent-ink:#FFFFFF;--out:#B5532A;--in:#0E6B58;--warn:#9A6100;--gold:#8A6D12;
+  --chip:#E6ECE7;--shadow:0 1px 2px rgba(21,34,31,.06),0 6px 18px rgba(21,34,31,.06);
+  --display:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1715;--surface:#172320;--ink:#E8EFEA;--mute:#93A29B;--line:#263531;
+  --accent:#4FC3A5;--accent-ink:#06211B;--out:#E58A5F;--in:#4FC3A5;--warn:#E0A93B;--gold:#D8B754;
+  --chip:#1F2E2A;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);}}
+:root[data-theme="dark"]{
+  --bg:#0F1715;--surface:#172320;--ink:#E8EFEA;--mute:#93A29B;--line:#263531;
+  --accent:#4FC3A5;--accent-ink:#06211B;--out:#E58A5F;--in:#4FC3A5;--warn:#E0A93B;--gold:#D8B754;
+  --chip:#1F2E2A;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--display);font-size:15px;line-height:1.4;padding-inline:16px;padding-block:14px 92px;max-width:720px;margin-inline:auto}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
+.top h1{font-size:22px;letter-spacing:-.02em}
+.top .fecha{color:var(--mute);font-size:13px}.top .fecha::first-letter{text-transform:uppercase}
+.banner{background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--warn);margin-bottom:12px}
+.sec{margin-block:22px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--mute);font-weight:600}
+.total{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.total small{opacity:.8;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.total .big{font-size:32px;font-weight:600;margin-top:2px}
+.total .sub{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:13px;opacity:.92}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.bol{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.bol .n{font-size:12px;color:var(--mute)}
+.bol .v{font-size:18px;font-weight:500;margin-top:2px}
+.bol.neg .v{color:var(--out)}
+.bol.gold .n{color:var(--gold)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.sm{padding:5px 11px;font-size:13px}
+.btn.danger{color:var(--out)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .main{flex:1;min-width:0}
+.row .t{font-weight:600;overflow-wrap:anywhere}
+.row .s{font-size:12.5px;color:var(--mute);overflow-wrap:anywhere}
+.amt{font-family:var(--mono);font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.amt.in{color:var(--in)}.amt.out{color:var(--out)}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;background:var(--chip);color:var(--mute)}
+.pill.ok{background:var(--accent);color:var(--accent-ink)}
+.pill.late{color:var(--warn);border:1px solid var(--warn);background:transparent}
+.pill.today{border:1px solid var(--accent);color:var(--accent);background:transparent}
+.day{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center}
+.day .d{font-size:12px;color:var(--mute);text-transform:capitalize;line-height:1.25}
+.day .d b{display:block;color:var(--ink);font-size:14px}
+.day.hoy{background:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+.weeknav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.weeknav .lbl{font-weight:600;text-align:center;flex:1}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.nav div{display:flex;width:100%;max-width:720px}
+.nav button{flex:1;background:none;border:0;padding:10px 4px;font-weight:600;font-size:13px;color:var(--mute);cursor:pointer;border-radius:8px}
+.nav button[aria-current="true"]{color:var(--accent);background:var(--chip)}
+.sheetbg{position:fixed;inset:0;background:rgba(10,18,16,.55);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:720px;max-height:92%;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet h3{font-size:18px;margin-bottom:12px}
+.f{display:flex;flex-direction:column;gap:4px;margin-bottom:11px}
+.f label{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.f input,.f select,.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 11px;width:100%}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:8px;font-weight:600;cursor:pointer;color:var(--mute)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.err{color:var(--out);font-size:13px;min-height:18px;margin-bottom:6px}
+.bar{height:8px;border-radius:4px;background:var(--chip);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--out)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.empty{padding:18px;color:var(--mute);text-align:center;font-size:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--mute);margin-top:6px}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style></head><body>
+<div id="app"></div>
+<div id="layer"></div>
+<div class="nav"><div id="nav"></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+'use strict';
+/* ---------- Firebase: pega aquí tu firebaseConfig ---------- */
+var FIREBASE_CONFIG={apiKey:'AIzaSyDi-gv6YmoCmh37QBsVZyS405cdWTFV-RQ',authDomain:'ingresos-y-gastos-sessanio.firebaseapp.com',projectId:'ingresos-y-gastos-sessanio',storageBucket:'ingresos-y-gastos-sessanio.firebasestorage.app',messagingSenderId:'956118320227',appId:'1:956118320227:web:51804f189f1fae32d5a456'};
+var PREFIX='caja_';
+
+/* ---------- config ---------- */
+var BOLS={
+  caja:{n:'Caja (efectivo)',amb:'negocio',grp:'libre'},
+  bold:{n:'Bold',amb:'negocio',grp:'libre'},
+  transf:{n:'Transferencias (Bancolombia)',amb:'negocio',grp:'libre'},
+  arriendo:{n:'Alcancía arriendo',amb:'negocio',grp:'apartado'},
+  servicios:{n:'Alcancía servicios y varios',amb:'negocio',grp:'apartado'},
+  propinas:{n:'Alcancía propinas',amb:'negocio',grp:'apartado'},
+  p_efectivo:{n:'Efectivo personal',amb:'personal',grp:'personal'},
+  p_cuenta:{n:'Cuenta personal',amb:'personal',grp:'personal'}
+};
+var CATS={
+  negocio:{gasto:['Compras / mercado','Nómina','Arriendo','Servicios públicos','Domicilios','Mantenimiento','Impuestos y trámites','Retiro del propietario','Otro'],ingreso:['Venta','Propina','Aporte del propietario','Otro']},
+  personal:{gasto:['Gasolina','Comida','Celular','Transporte','Salud','Hogar','Ocio','Otro'],ingreso:['Ingreso','Otro']}
+};
+var DEF_CFG={
+  semana:[
+    {dia:1,key:'liliana',nombre:'Liliana',tipo:'nomina',monto:0},
+    {dia:2,key:'vanessa',nombre:'Vanessa',tipo:'nomina',monto:0},
+    {dia:3,key:'karina',nombre:'Karina',tipo:'nomina',monto:0},
+    {dia:4,key:'mercados',nombre:'Mercados',tipo:'compras',monto:0},
+    {dia:5,key:'juanita',nombre:'Juanita',tipo:'nomina',monto:0}
+  ],
+  fijos:[
+    {key:'sisley',nombre:'Sisley',frecuencia:'mensual',monto:0},
+    {key:'simon',nombre:'Simón',frecuencia:'mensual',monto:0}
+  ]
+};
+var DIAS=['','lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+
+/* ---------- state ---------- */
+var S={db:null,dbChecked:false,movs:[],pagos:{},cfg:JSON.parse(JSON.stringify(DEF_CFG)),tab:'hoy',week:0,mes:null,fAmb:'todo',fBol:'todo',pendDel:null};
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function hoy(){return new Date(Date.now()-5*3600*1000).toISOString().slice(0,10)}
+function addDays(iso,n){var d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function mondayOf(iso){var d=new Date(iso+'T00:00:00Z');return addDays(iso,-((d.getUTCDay()+6)%7))}
+function fDia(iso,long){return new Date(iso+'T00:00:00Z').toLocaleDateString('es-CO',{weekday:long?'long':'short',day:'numeric',month:'short',timeZone:'UTC'})}
+function money(n){n=Math.round(n*100)/100;return (n<0?'−':'')+'$'+Math.abs(n).toLocaleString('es-CO',{maximumFractionDigits:2})}
+function parseMonto(s){s=String(s||'').replace(/[^0-9,.\-]/g,'');if(!s)return NaN;
+  if(s.indexOf(',')>-1){s=s.replace(/\./g,'').replace(',','.')}else if(/^\-?\d{1,3}(\.\d{3})+$/.test(s)){s=s.replace(/\./g,'')}
+  return parseFloat(s)}
+function mesDe(iso){return iso.slice(0,7)}
+function mesLbl(m){return new Date(m+'-01T00:00:00Z').toLocaleDateString('es-CO',{month:'long',year:'numeric',timeZone:'UTC'})}
+
+/* ---------- money math ---------- */
+function deltas(m){
+  var a=Number(m.monto)||0;
+  if(m.tipo==='gasto')return [[m.desde,-a]];
+  if(m.tipo==='traslado')return [[m.desde,-a],[m.hacia,a]];
+  return [[m.hacia,a]]; // apertura, ingreso, ajuste
+}
+function saldos(){
+  var s={};Object.keys(BOLS).forEach(function(k){s[k]=0});
+  S.movs.forEach(function(m){deltas(m).forEach(function(d){if(d[0] in s)s[d[0]]+=d[1]})});
+  return s;
+}
+function ambDe(m){var b=m.tipo==='ingreso'||m.tipo==='apertura'||m.tipo==='ajuste'?m.hacia:m.desde;return BOLS[b]?BOLS[b].amb:'negocio'}
+
+/* ---------- persistence (db when available, memory otherwise) ---------- */
+function newId(){return 'm'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function dbErr(e){toast('No se pudo guardar: '+(e&&e.message?e.message:'error'))}
+function saveMov(m){
+  if(S.db){var ref=S.db.collection('movs').doc();return ref.set(m).then(function(){return ref.id}).catch(function(e){dbErr(e);throw e})}
+  var id=newId();S.movs.push(Object.assign({id:id},m));render();return Promise.resolve(id);
+}
+function removeMov(id){
+  if(S.db)return S.db.doc('movs/'+id).delete().catch(dbErr);
+  S.movs=S.movs.filter(function(m){return m.id!==id});render();return Promise.resolve();
+}
+function savePago(id,p){
+  if(S.db)return S.db.doc('pagos/'+id).set(p).catch(function(e){dbErr(e);throw e});
+  S.pagos[id]=p;render();return Promise.resolve();
+}
+function removePago(id){
+  if(S.db)return S.db.doc('pagos/'+id).delete().catch(dbErr);
+  delete S.pagos[id];render();return Promise.resolve();
+}
+function saveCfg(){
+  if(S.db)return S.db.doc('config/nomina').set(S.cfg).catch(dbErr);
+  return Promise.resolve();
+}
+function toast(msg){var e=$('errline');if(e){e.textContent=msg}else{S.msg=msg;render()}}
+
+/* ---------- views ---------- */
+function balCard(k,s){
+  var b=BOLS[k],v=s[k];
+  return '<div class="bol'+(v<0?' neg':'')+(k==='propinas'?' gold':'')+'"><div class="n">'+esc(b.n)+'</div><div class="v mono">'+money(v)+'</div></div>';
+}
+function movRow(m){
+  var neg=m.tipo==='gasto'||(m.tipo==='ajuste'&&m.monto<0);
+  var sign=neg?'out':(m.tipo==='traslado'?'':'in');
+  var pre=neg?'−':(m.tipo==='traslado'?'':'+');
+  var ruta=m.tipo==='traslado'?BOLS[m.desde].n+' → '+BOLS[m.hacia].n:(BOLS[m.tipo==='gasto'?m.desde:m.hacia]||{n:'?'}).n;
+  var titulo=m.tipo==='apertura'?'Saldo de apertura':(m.tipo==='ajuste'?'Ajuste de saldo':(m.tipo==='traslado'?'Traslado':(m.categoria||m.tipo)));
+  var sub=fDia(m.fecha)+' · '+ruta+(m.nota?' · '+m.nota:'');
+  var ask=S.pendDel===m.id;
+  return '<div class="row"><div class="main"><div class="t">'+esc(titulo)+'</div><div class="s">'+esc(sub)+'</div></div>'+
+    '<div class="amt '+sign+'">'+pre+money(Math.abs(m.monto)).replace('−','')+'</div>'+
+    (ask?'<button class="btn sm danger" data-act="del-mov" data-id="'+esc(m.id)+'">¿Borrar?</button>':
+    '<button class="btn sm" aria-label="Borrar movimiento" data-act="ask-del" data-id="'+esc(m.id)+'">✕</button>')+'</div>';
+}
+function sortedMovs(){return S.movs.slice().sort(function(a,b){return (b.fecha+(b.ts||0)).toString().localeCompare((a.fecha+(a.ts||0)).toString())})}
+
+function vHoy(){
+  var s=saldos(),libre=s.caja+s.bold+s.transf,apart=s.arriendo+s.servicios+s.propinas;
+  var h='<div class="total"><small>Negocio · Sessanio</small><div class="big mono">'+money(libre+apart)+'</div>'+
+    '<div class="sub"><span>Libre <b class="mono">'+money(libre)+'</b></span><span>Apartado en alcancías <b class="mono">'+money(apart)+'</b></span></div></div>';
+  h+='<div class="sec"><h2>Dónde está la plata</h2></div><div class="grid">'+['caja','bold','transf'].map(function(k){return balCard(k,s)}).join('')+'</div>';
+  h+='<div class="sec"><h2>Alcancías</h2></div><div class="grid">'+['arriendo','servicios','propinas'].map(function(k){return balCard(k,s)}).join('')+'</div>';
+  h+='<div class="sec"><h2>Registrar</h2></div><div class="actions">'+
+    '<button class="btn pri" data-act="open-mov" data-tipo="gasto">− Gasto</button>'+
+    '<button class="btn pri" data-act="open-mov" data-tipo="ingreso">+ Ingreso</button>'+
+    '<button class="btn" data-act="open-mov" data-tipo="traslado">⇄ Traslado</button>'+
+    '<button class="btn" data-act="open-cierre">Cierre del día</button></div>';
+  h+='<div class="actions" style="margin-top:8px"><button class="btn sm" data-act="alc" data-b="arriendo" data-m="200000">Dejar arriendo $200.000</button>'+
+    '<button class="btn sm" data-act="alc" data-b="servicios" data-m="100000">Dejar servicios $100.000</button>'+
+    '<button class="btn sm" data-act="alc" data-b="propinas" data-m="">Dejar propinas…</button></div>';
+  var t=hoy(),due=[];
+  S.cfg.semana.forEach(function(p){ if(addDays(mondayOf(t),p.dia-1)===t&&!S.pagos[t+'_'+p.key])due.push(p)});
+  if(due.length){h+='<div class="sec"><h2>Pago de hoy</h2></div><div class="list">'+due.map(function(p){return '<div class="row"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+esc(DIAS[p.dia])+' · '+(p.monto?money(p.monto):'monto por definir')+'</div></div><button class="btn sm pri" data-act="open-pago" data-fecha="'+t+'" data-key="'+esc(p.key)+'">Marcar pagado</button></div>'}).join('')+'</div>'}
+  var ps=S.movs.filter(function(m){return BOLS[m.tipo==='gasto'?m.desde:m.hacia]&&ambDe(m)==='personal'});
+  var sp=saldos();
+  h+='<div class="sec"><h2>Personal</h2></div><div class="grid">'+['p_efectivo','p_cuenta'].map(function(k){return balCard(k,sp)}).join('')+'</div>';
+  var ult=sortedMovs().slice(0,8);
+  h+='<div class="sec"><h2>Últimos movimientos</h2><button class="btn sm" data-act="tab" data-t="movs">Ver todos</button></div>'+
+    (ult.length?'<div class="list">'+ult.map(movRow).join('')+'</div>':'<div class="list"><div class="empty">Aún no hay movimientos.</div></div>');
+  return h;
+}
+
+function vMovs(){
+  var meses={};S.movs.forEach(function(m){meses[mesDe(m.fecha)]=1});meses[mesDe(hoy())]=1;
+  var ml=Object.keys(meses).sort().reverse();if(!S.mes||!meses[S.mes])S.mes=ml[0];
+  var list=sortedMovs().filter(function(m){
+    if(mesDe(m.fecha)!==S.mes)return false;
+    if(S.fAmb!=='todo'&&ambDe(m)!==S.fAmb)return false;
+    if(S.fBol!=='todo'&&m.desde!==S.fBol&&m.hacia!==S.fBol)return false;
+    return true});
+  var ing=0,gas=0,cat={};
+  list.forEach(function(m){
+    if(m.tipo==='ingreso'){ing+=m.monto}
+    if(m.tipo==='gasto'){gas+=m.monto;var c=m.categoria||'Otro';cat[c]=(cat[c]||0)+m.monto}
+  });
+  var h='<div class="f2"><div class="f"><label for="f-mes">Mes</label><select id="f-mes" data-chg="mes">'+ml.map(function(m){return '<option value="'+m+'"'+(m===S.mes?' selected':'')+'>'+esc(mesLbl(m))+'</option>'}).join('')+'</select></div>'+
+    '<div class="f"><label for="f-amb">Ámbito</label><select id="f-amb" data-chg="fAmb"><option value="todo">Todo</option><option value="negocio"'+(S.fAmb==='negocio'?' selected':'')+'>Negocio</option><option value="personal"'+(S.fAmb==='personal'?' selected':'')+'>Personal</option></select></div></div>';
+  h+='<div class="f"><label for="f-bol">Bolsillo</label><select id="f-bol" data-chg="fBol"><option value="todo">Todos</option>'+Object.keys(BOLS).map(function(k){return '<option value="'+k+'"'+(S.fBol===k?' selected':'')+'>'+esc(BOLS[k].n)+'</option>'}).join('')+'</select></div>';
+  h+='<div class="kpis"><div class="bol"><div class="n">Ingresos del mes</div><div class="v mono" style="color:var(--in)">'+money(ing)+'</div></div><div class="bol"><div class="n">Gastos del mes</div><div class="v mono" style="color:var(--out)">'+money(gas)+'</div></div></div>';
+  var ck=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a]});
+  if(ck.length){h+='<div class="sec"><h2>Gastos por categoría</h2></div><div class="list">'+ck.map(function(k){return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between;gap:10px"><span>'+esc(k)+'</span><span class="amt">'+money(cat[k])+'</span></div><div class="bar"><i style="width:'+Math.max(3,Math.round(cat[k]/gas*100))+'%"></i></div></div>'}).join('')+'</div>'}
+  h+='<div class="sec"><h2>Movimientos ('+list.length+')</h2></div>'+(list.length?'<div class="list">'+list.map(movRow).join('')+'</div>':'<div class="list"><div class="empty">Sin movimientos con este filtro.</div></div>');
+  return h;
+}
+
+function pagoRow(fecha,p,hoyIso){
+  var id=fecha+'_'+p.key,pg=S.pagos[id],est;
+  if(pg)est='<span class="pill ok">Pagado '+money(pg.monto)+'</span>';
+  else if(fecha<hoyIso)est='<span class="pill late">Sin marcar</span>';
+  else if(fecha===hoyIso)est='<span class="pill today">Hoy</span>';
+  else est='<span class="pill">Programado</span>';
+  var act=pg?'<button class="btn sm" data-act="undo-pago" data-id="'+esc(id)+'">Deshacer</button>':'<button class="btn sm pri" data-act="open-pago" data-fecha="'+fecha+'" data-key="'+esc(p.key)+'">Pagar</button>';
+  return '<div class="row day'+(fecha===hoyIso?' hoy':'')+'"><div class="d"><b>'+esc(DIAS[p.dia].slice(0,3))+'</b>'+esc(fDia(fecha).replace(/^\S+\s*/,''))+'</div><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+(p.tipo==='compras'?'Compras del negocio':'Nómina')+(pg?'':' · '+(p.monto?money(p.monto):'monto por definir'))+'</div><div style="margin-top:4px">'+est+'</div></div>'+act+'</div>';
+}
+function periodos(mes,f){return f==='quincenal'?[{id:mes+'-Q1',l:'1ª quincena'},{id:mes+'-Q2',l:'2ª quincena'}]:[{id:mes,l:'Mes completo'}]}
+function vNomina(){
+  var t=hoy(),lun=addDays(mondayOf(t),S.week*7),dom=addDays(lun,6);
+  var h='<div class="weeknav"><button class="btn sm" data-act="week" data-d="-1" aria-label="Semana anterior">‹</button><div class="lbl">'+esc(fDia(lun))+' – '+esc(fDia(dom))+(S.week===0?' <span class="pill today">esta semana</span>':'')+'</div><button class="btn sm" data-act="week" data-d="1" aria-label="Semana siguiente">›</button></div>';
+  h+='<div class="sec"><h2>Pagos de la semana</h2></div><div class="list">'+S.cfg.semana.slice().sort(function(a,b){return a.dia-b.dia}).map(function(p){return pagoRow(addDays(lun,p.dia-1),p,t)}).join('')+'</div>';
+  var mes=mesDe(addDays(lun,3));
+  h+='<div class="sec"><h2>Nómina fija · '+esc(mesLbl(mes))+'</h2></div><div class="list">'+S.cfg.fijos.map(function(f){
+    var per=periodos(mes,f.frecuencia);
+    return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(f.nombre)+'</b><span class="s">'+esc(f.frecuencia)+' · '+(f.monto?money(f.monto):'monto por definir')+'</span></div>'+
+      per.map(function(p){var id='fijo_'+f.key+'_'+p.id,pg=S.pagos[id];
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px"><span>'+esc(p.l)+'</span>'+(pg?'<span><span class="pill ok">Pagado '+esc(fDia(pg.fecha))+' · '+money(pg.monto)+'</span> <button class="btn sm" data-act="undo-pago" data-id="'+esc(id)+'">Deshacer</button></span>':'<button class="btn sm pri" data-act="open-pago" data-fijo="'+esc(f.key)+'" data-per="'+esc(p.id)+'">Marcar pagado</button>')+'</div>'}).join('')+'</div>'}).join('')+'</div>';
+  h+='<p class="hint">Cada pago marcado descuenta del bolsillo que elijas y queda como gasto (Nómina o Compras) en Movimientos.</p>';
+  return h;
+}
+
+function vAjustes(){
+  var s=saldos();
+  var h='<div class="sec"><h2>Pagos semanales</h2></div><div class="list">'+S.cfg.semana.map(function(p,i){return '<div class="row"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+esc(DIAS[p.dia])+'</div></div><div class="f" style="margin:0;width:140px"><label for="cw'+i+'" class="s">Monto</label><input id="cw'+i+'" data-cfg="semana" data-i="'+i+'" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div>'}).join('')+'</div>';
+  h+='<div class="sec"><h2>Nómina fija</h2></div><div class="list">'+S.cfg.fijos.map(function(p,i){return '<div class="row"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="f" style="margin:6px 0 0"><select id="cf'+i+'" aria-label="Frecuencia de '+esc(p.nombre)+'" data-cfgf="'+i+'"><option value="mensual"'+(p.frecuencia==='mensual'?' selected':'')+'>Mensual</option><option value="quincenal"'+(p.frecuencia==='quincenal'?' selected':'')+'>Quincenal</option></select></div></div><div class="f" style="margin:0;width:140px"><label for="cx'+i+'" class="s">Monto por pago</label><input id="cx'+i+'" data-cfg="fijos" data-i="'+i+'" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div>'}).join('')+'</div>';
+  h+='<p class="hint">Los montos son referencia: al marcar un pago puedes cambiarlo.</p>';
+  h+='<div class="sec"><h2>Ajustar un saldo al real</h2></div><div class="list" style="padding:12px"><div class="f2"><div class="f"><label for="aj-b">Bolsillo</label><select id="aj-b">'+Object.keys(BOLS).map(function(k){return '<option value="'+k+'">'+esc(BOLS[k].n)+' ('+money(s[k])+')</option>'}).join('')+'</select></div><div class="f"><label for="aj-v">Saldo real hoy</label><input id="aj-v" inputmode="decimal" placeholder="0"></div></div><div class="err" id="errline"></div><button class="btn pri" data-act="ajustar">Ajustar</button><p class="hint">Crea un movimiento de ajuste por la diferencia. Sirve para alcancías y para cuadrar con Bold o Bancolombia.</p></div><div class="sec"><h2>Sesión</h2></div><button class="btn" data-act="logout">Cerrar sesión</button>';
+  return h;
+}
+
+/* ---------- forms ---------- */
+function bolsOpts(amb,sel){
+  var g={negocio:[],personal:[]};Object.keys(BOLS).forEach(function(k){g[BOLS[k].amb].push(k)});
+  return ['negocio','personal'].filter(function(a){return !amb||amb===a}).map(function(a){return '<optgroup label="'+(a==='negocio'?'Negocio':'Personal')+'">'+g[a].map(function(k){return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+esc(BOLS[k].n)+'</option>'}).join('')+'</optgroup>'}).join('');
+}
+function catOpts(tipo,bol){var amb=BOLS[bol]?BOLS[bol].amb:'negocio';return (CATS[amb][tipo]||[]).map(function(c){return '<option>'+esc(c)+'</option>'}).join('')}
+function sheet(html){$('layer').innerHTML='<div class="sheetbg" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true">'+html+'</div></div>'}
+function closeSheet(){$('layer').innerHTML=''}
+var F={tipo:'gasto'};
+function openMov(tipo,pre){
+  F.tipo=tipo;pre=pre||{};
+  var defB=pre.bol||(tipo==='ingreso'?'caja':'caja');
+  sheet('<h3>Nuevo movimiento</h3><div class="seg" role="group" aria-label="Tipo">'+['gasto','ingreso','traslado'].map(function(t){return '<button data-act="mov-tipo" data-t="'+t+'" aria-pressed="'+(t===tipo)+'">'+t[0].toUpperCase()+t.slice(1)+'</button>'}).join('')+'</div><div id="mov-body"></div>');
+  movBody(pre);
+}
+function movBody(pre){
+  pre=pre||{};var t=F.tipo,defB=pre.bol||'caja';
+  var h='<div class="f2"><div class="f"><label for="m-monto">Monto</label><input id="m-monto" inputmode="decimal" placeholder="0" value="'+esc(pre.monto||'')+'"></div><div class="f"><label for="m-fecha">Fecha</label><input id="m-fecha" type="date" value="'+hoy()+'"></div></div>';
+  if(t==='traslado'){
+    h+='<div class="f2"><div class="f"><label for="m-desde">Sale de</label><select id="m-desde">'+bolsOpts(null,'caja')+'</select></div><div class="f"><label for="m-hacia">Entra a</label><select id="m-hacia">'+bolsOpts(null,pre.hacia||'arriendo')+'</select></div></div>';
+  }else{
+    h+='<div class="f"><label for="m-bol">'+(t==='gasto'?'Pagado desde':'Entra a')+'</label><select id="m-bol" data-chg="movbol">'+bolsOpts(null,defB)+'</select></div><div class="f"><label for="m-cat">Categoría</label><select id="m-cat">'+catOpts(t,defB)+'</select></div>';
+  }
+  h+='<div class="f"><label for="m-nota">Nota (opcional)</label><input id="m-nota" placeholder="Ej. gasolina moto, proveedor…" value="'+esc(pre.nota||'')+'"></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-mov" style="width:100%">Guardar</button>';
+  $('mov-body').innerHTML=h;
+}
+function saveMovForm(){
+  var t=F.tipo,monto=parseMonto($('m-monto').value),fecha=$('m-fecha').value,nota=$('m-nota').value.trim(),err=$('errline');
+  if(!(monto>0)){err.textContent='Escribe un monto mayor a cero.';return}
+  if(!fecha){err.textContent='Falta la fecha.';return}
+  var m={tipo:t,monto:monto,fecha:fecha,nota:nota,ts:Date.now()};
+  if(t==='traslado'){m.desde=$('m-desde').value;m.hacia=$('m-hacia').value;if(m.desde===m.hacia){err.textContent='Origen y destino son el mismo bolsillo.';return}}
+  else{var b=$('m-bol').value;m.categoria=$('m-cat').value;if(t==='gasto')m.desde=b;else m.hacia=b}
+  saveMov(m).then(closeSheet).catch(function(){err.textContent='No se pudo guardar. Intenta de nuevo.'});
+}
+function openCierre(){
+  var rows=[['datafono','Datáfono','bold'],['efectivo','Efectivo','caja'],['qr','QR','transf'],['transf','Transferencias','transf']];
+  sheet('<h3>Cierre del día</h3><div class="f"><label for="c-fecha">Fecha del cierre</label><input id="c-fecha" type="date" value="'+hoy()+'"></div>'+
+    rows.map(function(r){return '<div class="f2"><div class="f"><label for="c-'+r[0]+'">'+r[1]+'</label><input id="c-'+r[0]+'" inputmode="decimal" placeholder="0"></div><div class="f"><label for="c-'+r[0]+'-d">Entra a</label><select id="c-'+r[0]+'-d">'+bolsOpts('negocio',r[2])+'</select></div></div>'}).join('')+
+    '<div class="f2"><div class="f"><label for="c-prop">Propinas</label><input id="c-prop" inputmode="decimal" placeholder="0"></div><div class="f"><label for="c-prop-d">Entra a</label><select id="c-prop-d">'+bolsOpts('negocio','propinas')+'</select></div></div>'+
+    '<div class="f2"><div class="f"><label for="c-gas">Gastos pagados de caja</label><input id="c-gas" inputmode="decimal" placeholder="0"></div><div class="f"><label for="c-gas-c">Categoría</label><select id="c-gas-c">'+catOpts('gasto','caja')+'</select></div></div>'+
+    '<p class="hint">Copia los valores del comprobante de Loggro. Las alcancías de arriendo y servicios se dejan aparte con los botones de Hoy.</p><div class="err" id="errline"></div><button class="btn pri" data-act="save-cierre" style="width:100%">Registrar cierre</button>');
+}
+function saveCierre(){
+  var fecha=$('c-fecha').value,err=$('errline');if(!fecha){err.textContent='Falta la fecha.';return}
+  if(S.movs.some(function(m){return m.cierre===fecha})){err.textContent='Ya hay un cierre registrado para esa fecha. Bórralo en Movimientos si vas a repetirlo.';return}
+  var jobs=[];
+  [['datafono','Venta datáfono'],['efectivo','Venta efectivo'],['qr','Venta QR'],['transf','Venta transferencias']].forEach(function(r){
+    var v=parseMonto($('c-'+r[0]).value);if(v>0)jobs.push({tipo:'ingreso',hacia:$('c-'+r[0]+'-d').value,monto:v,categoria:'Venta',nota:r[1]});
+  });
+  var p=parseMonto($('c-prop').value);if(p>0)jobs.push({tipo:'ingreso',hacia:$('c-prop-d').value,monto:p,categoria:'Propina',nota:'Propinas del día'});
+  var g=parseMonto($('c-gas').value);if(g>0)jobs.push({tipo:'gasto',desde:'caja',monto:g,categoria:$('c-gas-c').value,nota:'Gastos de caja del día'});
+  if(!jobs.length){err.textContent='Escribe al menos un valor.';return}
+  var i=0;(function next(){if(i>=jobs.length){closeSheet();return}
+    var j=jobs[i++];j.fecha=fecha;j.cierre=fecha;j.ts=Date.now()+i;
+    saveMov(j).then(next).catch(function(){err.textContent='Se guardaron '+(i-1)+' de '+jobs.length+'. Revisa Movimientos antes de repetir.'})})();
+}
+function openAlc(b,m){
+  sheet('<h3>Dejar en '+esc(BOLS[b].n.toLowerCase())+'</h3><div class="f2"><div class="f"><label for="a-monto">Monto</label><input id="a-monto" inputmode="decimal" value="'+esc(m||'')+'" placeholder="0"></div><div class="f"><label for="a-fecha">Fecha</label><input id="a-fecha" type="date" value="'+hoy()+'"></div></div><div class="f"><label for="a-desde">Sale de</label><select id="a-desde">'+bolsOpts('negocio','caja')+'</select></div><input type="hidden" id="a-b" value="'+b+'"><div class="err" id="errline"></div><button class="btn pri" data-act="save-alc" style="width:100%">Guardar</button>');
+}
+function saveAlc(){
+  var v=parseMonto($('a-monto').value),err=$('errline');if(!(v>0)){err.textContent='Escribe un monto mayor a cero.';return}
+  saveMov({tipo:'traslado',desde:$('a-desde').value,hacia:$('a-b').value,monto:v,fecha:$('a-fecha').value||hoy(),nota:'Alcancía',ts:Date.now()}).then(closeSheet).catch(function(){err.textContent='No se pudo guardar.'});
+}
+var PG={};
+function openPago(d){
+  var p,id,fecha,titulo;
+  if(d.fijo){var f=S.cfg.fijos.filter(function(x){return x.key===d.fijo})[0];p={key:f.key,nombre:f.nombre,tipo:'nomina',monto:f.monto};id='fijo_'+f.key+'_'+d.per;fecha=hoy();titulo=f.nombre+' · '+d.per}
+  else{p=S.cfg.semana.filter(function(x){return x.key===d.key})[0];id=d.fecha+'_'+p.key;fecha=d.fecha;titulo=p.nombre+' · '+fDia(d.fecha,true)}
+  PG={id:id,p:p};
+  sheet('<h3>Marcar pagado</h3><p class="hint" style="margin:-6px 0 12px">'+esc(titulo)+'</p><div class="f2"><div class="f"><label for="p-monto">Monto pagado</label><input id="p-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div><div class="f"><label for="p-fecha">Fecha del pago</label><input id="p-fecha" type="date" value="'+(d.fijo?hoy():fecha)+'"></div></div><div class="f"><label for="p-desde">Pagado desde</label><select id="p-desde">'+bolsOpts('negocio','caja')+'</select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-pago" style="width:100%">Confirmar pago</button>');
+}
+function savePagoForm(){
+  var v=parseMonto($('p-monto').value),err=$('errline'),p=PG.p;if(!(v>0)){err.textContent='Escribe el monto pagado.';return}
+  var fecha=$('p-fecha').value||hoy(),desde=$('p-desde').value;
+  saveMov({tipo:'gasto',desde:desde,monto:v,fecha:fecha,categoria:p.tipo==='compras'?'Compras / mercado':'Nómina',nota:p.nombre,pagoId:PG.id,ts:Date.now()}).then(function(mid){
+    return savePago(PG.id,{key:p.key,nombre:p.nombre,monto:v,fecha:fecha,desde:desde,movId:mid})}).then(closeSheet).catch(function(){err.textContent='No se pudo guardar.'});
+}
+function undoPago(id){
+  var pg=S.pagos[id];if(!pg)return;
+  (pg.movId?removeMov(pg.movId):Promise.resolve()).then(function(){return removePago(id)});
+}
+function ajustar(){
+  var b=$('aj-b').value,real=parseMonto($('aj-v').value),err=$('errline');
+  if(isNaN(real)){err.textContent='Escribe el saldo real.';return}
+  var diff=Math.round((real-saldos()[b])*100)/100;
+  if(diff===0){err.textContent='Ya coincide, no hay nada que ajustar.';return}
+  saveMov({tipo:'ajuste',hacia:b,monto:diff,fecha:hoy(),nota:'Saldo real '+money(real),ts:Date.now()}).then(function(){$('aj-v').value='';toast('Ajuste guardado: '+money(diff))});
+}
+
+/* ---------- render & events ---------- */
+var TABS=[['hoy','Hoy'],['movs','Movimientos'],['nomina','Nómina'],['ajustes','Ajustes']];
+function render(){
+  var y=window.scrollY;
+  $('nav').innerHTML=TABS.map(function(t){return '<button data-act="tab" data-t="'+t[0]+'" aria-current="'+(S.tab===t[0])+'">'+t[1]+'</button>'}).join('');
+  var body={hoy:vHoy,movs:vMovs,nomina:vNomina,ajustes:vAjustes}[S.tab]();
+  var ban=(S.dbChecked&&!S.db)?'<div class="banner">Sin guardado compartido en esta vista: lo que registres se pierde al cerrar.</div>':'';
+  $('app').innerHTML='<div class="top"><h1>Caja Sessanio</h1><div class="fecha">'+esc(fDia(hoy(),true))+'</div></div>'+ban+body;
+  window.scrollTo(0,y);
+}
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');if(!el)return;
+  var a=el.dataset.act,d=el.dataset;
+  if(a==='close-bg'){if(e.target===el)closeSheet();return}
+  if(a==='tab'){S.tab=d.t;S.pendDel=null;render();window.scrollTo(0,0)}
+  else if(a==='week'){S.week+=Number(d.d);render()}
+  else if(a==='open-mov')openMov(d.tipo);
+  else if(a==='mov-tipo'){F.tipo=d.t;var seg=el.parentNode.querySelectorAll('button');seg.forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});movBody()}
+  else if(a==='save-mov')saveMovForm();
+  else if(a==='open-cierre')openCierre();
+  else if(a==='save-cierre')saveCierre();
+  else if(a==='alc')openAlc(d.b,d.m);
+  else if(a==='save-alc')saveAlc();
+  else if(a==='open-pago')openPago(d);
+  else if(a==='save-pago')savePagoForm();
+  else if(a==='undo-pago')undoPago(d.id);
+  else if(a==='ask-del'){S.pendDel=d.id;render()}
+  else if(a==='del-mov'){var m=S.movs.filter(function(x){return x.id===d.id})[0];S.pendDel=null;
+    removeMov(d.id).then(function(){if(m&&m.pagoId&&S.pagos[m.pagoId])return removePago(m.pagoId)})}
+  else if(a==='ajustar')ajustar();
+});
+document.addEventListener('change',function(e){
+  var el=e.target,c=el.dataset.chg;
+  if(c==='mes'){S.mes=el.value;render()}
+  else if(c==='fAmb'){S.fAmb=el.value;render()}
+  else if(c==='fBol'){S.fBol=el.value;render()}
+  else if(c==='movbol'){$('m-cat').innerHTML=catOpts(F.tipo,el.value)}
+  else if(el.dataset.cfg){var v=parseMonto(el.value);S.cfg[el.dataset.cfg][Number(el.dataset.i)].monto=isNaN(v)?0:v;saveCfg()}
+  else if(el.dataset.cfgf!==undefined){S.cfg.fijos[Number(el.dataset.cfgf)].frecuencia=el.value;saveCfg().then(render)}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
+
+/* ---------- boot ---------- */
+function shell(html){$('app').innerHTML='<div class="top"><h1>Caja Sessanio</h1></div>'+html;$('nav').innerHTML=''}
+function setupScreen(){shell('<div class="banner">Falta pegar el firebaseConfig del proyecto en este archivo (variable FIREBASE_CONFIG).</div>')}
+function loginScreen(msg){
+  shell('<div class="list" style="padding:16px"><div class="f"><label for="l-mail">Correo</label><input id="l-mail" type="email" autocomplete="username"></div><div class="f"><label for="l-pass">Contraseña</label><input id="l-pass" type="password" autocomplete="current-password"></div><div class="err" id="errline">'+esc(msg||'')+'</div><button class="btn pri" style="width:100%" data-act="login">Entrar</button></div>');
+}
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');if(!el)return;
+  if(el.dataset.act==='login'){
+    var m=$('l-mail').value.trim(),p=$('l-pass').value;
+    firebase.auth().signInWithEmailAndPassword(m,p).catch(function(){$('errline').textContent='Correo o contraseña incorrectos.'});
+  }else if(el.dataset.act==='logout'){firebase.auth().signOut()}
+});
+var started=false;
+function start(){
+  if(started)return;started=true;
+  var fs=firebase.firestore();
+  S.db={collection:function(n){return fs.collection(PREFIX+n)},doc:function(p){var a=p.split('/');return fs.doc(PREFIX+a[0]+'/'+a[1])}};
+  S.dbChecked=true;render();
+  S.db.collection('movs').onSnapshot(function(q){S.movs=q.docs.map(function(d){return Object.assign({id:d.id},d.data())});render()},dbErr);
+  S.db.collection('pagos').onSnapshot(function(q){var p={};q.docs.forEach(function(d){p[d.id]=d.data()});S.pagos=p;render()},dbErr);
+  S.db.doc('config/nomina').onSnapshot(function(s){if(s.exists){var c=s.data();if(c.semana&&c.fijos){S.cfg=JSON.parse(JSON.stringify(c))}}render()},dbErr);
+}
+function boot(){
+  if(!FIREBASE_CONFIG.apiKey){setupScreen();return}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  try{firebase.firestore().enablePersistence({synchronizeTabs:true})}catch(e){}
+  firebase.auth().onAuthStateChanged(function(u){if(u){start()}else{started=false;S.db=null;loginScreen()}});
+}
+boot();
+})();
+</script>
+</body></html>
