@@ -124,18 +124,21 @@ var CATS={
 };
 var DEF_CFG={
   semana:[
-    {dia:1,key:'liliana',nombre:'Liliana',tipo:'nomina',monto:0},
-    {dia:2,key:'vanessa',nombre:'Vanessa',tipo:'nomina',monto:0},
-    {dia:3,key:'karina',nombre:'Karina',tipo:'nomina',monto:0},
-    {dia:4,key:'mercados',nombre:'Mercados',tipo:'compras',monto:0},
-    {dia:5,key:'juanita',nombre:'Juanita',tipo:'nomina',monto:0}
+    {dia:1,key:'liliana',nombre:'Liliana',tipo:'nomina',monto:0,medio:'',dato:''},
+    {dia:2,key:'vanessa',nombre:'Vanessa',tipo:'nomina',monto:0,medio:'',dato:''},
+    {dia:3,key:'karina',nombre:'Karina',tipo:'nomina',monto:0,medio:'',dato:''},
+    {dia:4,key:'mercados',nombre:'Mercados',tipo:'compras',monto:0,medio:'',dato:''},
+    {dia:5,key:'juanita',nombre:'Juanita',tipo:'nomina',monto:0,medio:'',dato:''}
   ],
   fijos:[
-    {key:'sisley',nombre:'Sisley',frecuencia:'mensual',monto:0},
-    {key:'simon',nombre:'Simón',frecuencia:'mensual',monto:0}
+    {key:'sisley',nombre:'Sisley',frecuencia:'mensual',monto:0,medio:'',dato:''},
+    {key:'simon',nombre:'Simón',frecuencia:'mensual',monto:0,medio:'',dato:''}
   ]
 };
 var DIAS=['','lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+var MEDIOS=[['','Sin definir'],['llave','Llave (Nequi/Daviplata/Bre-B)'],['ahorros','Cuenta de ahorros'],['corriente','Cuenta corriente'],['efectivo','Efectivo en mano']];
+function medioOpts(sel){return MEDIOS.map(function(m){return '<option value="'+m[0]+'"'+(m[0]===sel?' selected':'')+'>'+esc(m[1])+'</option>'}).join('')}
+function medioLbl(v){var m=MEDIOS.filter(function(x){return x[0]===v})[0];return m?m[1]:''}
 
 /* ---------- state ---------- */
 var S={db:null,dbChecked:false,movs:[],pagos:{},cfg:JSON.parse(JSON.stringify(DEF_CFG)),tab:'hoy',week:0,mes:null,fAmb:'todo',fBol:'todo',pendDel:null};
@@ -267,7 +270,7 @@ function pagoRow(fecha,p,hoyIso){
   else if(fecha===hoyIso)est='<span class="pill today">Hoy</span>';
   else est='<span class="pill">Programado</span>';
   var act=pg?'<button class="btn sm" data-act="undo-pago" data-id="'+esc(id)+'">Deshacer</button>':'<button class="btn sm pri" data-act="open-pago" data-fecha="'+fecha+'" data-key="'+esc(p.key)+'">Pagar</button>';
-  return '<div class="row day'+(fecha===hoyIso?' hoy':'')+'"><div class="d"><b>'+esc(DIAS[p.dia].slice(0,3))+'</b>'+esc(fDia(fecha).replace(/^\S+\s*/,''))+'</div><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+(p.tipo==='compras'?'Compras del negocio':'Nómina')+(pg?'':' · '+(p.monto?money(p.monto):'monto por definir'))+'</div><div style="margin-top:4px">'+est+'</div></div>'+act+'</div>';
+  return '<div class="row day'+(fecha===hoyIso?' hoy':'')+'"><div class="d"><b>'+esc(DIAS[p.dia].slice(0,3))+'</b>'+esc(fDia(fecha).replace(/^\S+\s*/,''))+'</div><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+(p.tipo==='compras'?'Compras del negocio':'Nómina')+(pg?'':' · '+(p.monto?money(p.monto):'monto por definir'))+'</div>'+(p.medio?'<div class="s" style="opacity:.7">'+esc(medioLbl(p.medio))+(p.dato?' · '+esc(p.dato):'')+'</div>':'')+'<div style="margin-top:4px">'+est+'</div></div>'+act+'</div>';
 }
 function periodos(mes,f){return f==='quincenal'?[{id:mes+'-Q1',l:'1ª quincena'},{id:mes+'-Q2',l:'2ª quincena'}]:[{id:mes,l:'Mes completo'}]}
 function vNomina(){
@@ -287,7 +290,7 @@ function vNomina(){
 function vAjustes(){
   var s=saldos();
   var h='<div class="sec"><h2>Pagos semanales</h2></div><div class="list">'+S.cfg.semana.map(function(p,i){return '<div class="row"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="s">'+esc(DIAS[p.dia])+'</div></div><div class="f" style="margin:0;width:140px"><label for="cw'+i+'" class="s">Monto</label><input id="cw'+i+'" data-cfg="semana" data-i="'+i+'" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div>'}).join('')+'</div>';
-  h+='<div class="sec"><h2>Nómina fija</h2></div><div class="list">'+S.cfg.fijos.map(function(p,i){return '<div class="row"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="f" style="margin:6px 0 0"><select id="cf'+i+'" aria-label="Frecuencia de '+esc(p.nombre)+'" data-cfgf="'+i+'"><option value="mensual"'+(p.frecuencia==='mensual'?' selected':'')+'>Mensual</option><option value="quincenal"'+(p.frecuencia==='quincenal'?' selected':'')+'>Quincenal</option></select></div></div><div class="f" style="margin:0;width:140px"><label for="cx'+i+'" class="s">Monto por pago</label><input id="cx'+i+'" data-cfg="fijos" data-i="'+i+'" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div>'}).join('')+'</div>';
+  h+='<div class="sec"><h2>Nómina fija</h2></div><div class="list">'+S.cfg.fijos.map(function(p,i){return '<div class="row" style="flex-wrap:wrap"><div class="main"><div class="t">'+esc(p.nombre)+'</div><div class="f" style="margin:6px 0 0"><select id="cf'+i+'" aria-label="Frecuencia de '+esc(p.nombre)+'" data-cfgf="'+i+'"><option value="mensual"'+(p.frecuencia==='mensual'?' selected':'')+'>Mensual</option><option value="quincenal"'+(p.frecuencia==='quincenal'?' selected':'')+'>Quincenal</option></select></div><div class="f" style="margin:6px 0 0"><label for="cm'+i+'" class="s">Medio de pago</label><select id="cm'+i+'" data-cfgmedio="'+i+'">'+medioOpts(p.medio)+'</select></div><div class="f" style="margin:6px 0 0"><label for="cd'+i+'" class="s">Cuenta / llave</label><input id="cd'+i+'" data-cfgdato="'+i+'" value="'+esc(p.dato||'')+'" placeholder="Número o nombre"></div></div><div class="f" style="margin:0;width:140px"><label for="cx'+i+'" class="s">Monto por pago</label><input id="cx'+i+'" data-cfg="fijos" data-i="'+i+'" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div>'}).join('')+'</div>';
   h+='<p class="hint">Los montos son referencia: al marcar un pago puedes cambiarlo.</p>';
   h+='<div class="sec"><h2>Ajustar un saldo al real</h2></div><div class="list" style="padding:12px"><div class="f2"><div class="f"><label for="aj-b">Bolsillo</label><select id="aj-b">'+Object.keys(BOLS).map(function(k){return '<option value="'+k+'">'+esc(BOLS[k].n)+' ('+money(s[k])+')</option>'}).join('')+'</select></div><div class="f"><label for="aj-v">Saldo real hoy</label><input id="aj-v" inputmode="decimal" placeholder="0"></div></div><div class="err" id="errline"></div><button class="btn pri" data-act="ajustar">Ajustar</button><p class="hint">Crea un movimiento de ajuste por la diferencia. Sirve para alcancías y para cuadrar con Bold o Bancolombia.</p></div><div class="sec"><h2>Sesión</h2></div><button class="btn" data-act="logout">Cerrar sesión</button>';
   return h;
@@ -360,10 +363,10 @@ function saveAlc(){
 var PG={};
 function openPago(d){
   var p,id,fecha,titulo;
-  if(d.fijo){var f=S.cfg.fijos.filter(function(x){return x.key===d.fijo})[0];p={key:f.key,nombre:f.nombre,tipo:'nomina',monto:f.monto};id='fijo_'+f.key+'_'+d.per;fecha=hoy();titulo=f.nombre+' · '+d.per}
+  if(d.fijo){var f=S.cfg.fijos.filter(function(x){return x.key===d.fijo})[0];p={key:f.key,nombre:f.nombre,tipo:'nomina',monto:f.monto,medio:f.medio,dato:f.dato};id='fijo_'+f.key+'_'+d.per;fecha=hoy();titulo=f.nombre+' · '+d.per}
   else{p=S.cfg.semana.filter(function(x){return x.key===d.key})[0];id=d.fecha+'_'+p.key;fecha=d.fecha;titulo=p.nombre+' · '+fDia(d.fecha,true)}
   PG={id:id,p:p};
-  sheet('<h3>Marcar pagado</h3><p class="hint" style="margin:-6px 0 12px">'+esc(titulo)+'</p><div class="f2"><div class="f"><label for="p-monto">Monto pagado</label><input id="p-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div><div class="f"><label for="p-fecha">Fecha del pago</label><input id="p-fecha" type="date" value="'+(d.fijo?hoy():fecha)+'"></div></div><div class="f"><label for="p-desde">Pagado desde</label><select id="p-desde">'+bolsOpts('negocio','caja')+'</select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-pago" style="width:100%">Confirmar pago</button>');
+  sheet('<h3>Marcar pagado</h3><p class="hint" style="margin:-6px 0 12px">'+esc(titulo)+(p.medio?' · '+esc(medioLbl(p.medio))+(p.dato?' · '+esc(p.dato):''):'')+'</p><div class="f2"><div class="f"><label for="p-monto">Monto pagado</label><input id="p-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div><div class="f"><label for="p-fecha">Fecha del pago</label><input id="p-fecha" type="date" value="'+(d.fijo?hoy():fecha)+'"></div></div><div class="f"><label for="p-desde">Pagado desde</label><select id="p-desde">'+bolsOpts('negocio','caja')+'</select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-pago" style="width:100%">Confirmar pago</button>');
 }
 function savePagoForm(){
   var v=parseMonto($('p-monto').value),err=$('errline'),p=PG.p;if(!(v>0)){err.textContent='Escribe el monto pagado.';return}
@@ -381,16 +384,16 @@ function openPlan(){
   sheet('<h3>Pagos de la semana</h3><p class="hint" style="margin:-6px 0 12px">Se repiten cada semana en el día elegido.</p><div class="list">'+(items.length?items.map(function(o){return '<div class="row"><div class="main"><div class="t">'+esc(o.p.nombre)+'</div><div class="s">'+esc(DIAS[o.p.dia])+' · '+(o.p.tipo==='compras'?'Compras':'Nómina')+' · '+(o.p.monto?money(o.p.monto):'monto por definir')+'</div></div><button class="btn sm" data-act="edit-item" data-i="'+o.i+'">Editar</button></div>'}).join(''):'<div class="empty">Sin pagos.</div>')+'</div><button class="btn pri" style="width:100%;margin-top:12px" data-act="edit-item" data-i="new">+ Agregar pago</button>');
 }
 function openItem(i){
-  var nuevo=(i==='new'),p=nuevo?{dia:1,nombre:'',tipo:'compras',monto:0}:S.cfg.semana[Number(i)];
+  var nuevo=(i==='new'),p=nuevo?{dia:1,nombre:'',tipo:'compras',monto:0,medio:'',dato:''}:S.cfg.semana[Number(i)];
   IT=nuevo?-1:Number(i);
-  sheet('<h3>'+(nuevo?'Nuevo pago':'Editar pago')+'</h3><div class="f"><label for="i-nombre">Nombre</label><input id="i-nombre" value="'+esc(p.nombre)+'" placeholder="Leche, Huevos, Hielo…"></div><div class="f2"><div class="f"><label for="i-dia">Día</label><select id="i-dia">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(d===p.dia?' selected':'')+'>'+esc(DIAS[d])+'</option>'}).join('')+'</select></div><div class="f"><label for="i-monto">Monto</label><input id="i-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div><div class="f"><label for="i-tipo">Tipo</label><select id="i-tipo"><option value="compras"'+(p.tipo==='compras'?' selected':'')+'>Compras del negocio</option><option value="nomina"'+(p.tipo==='nomina'?' selected':'')+'>Nómina</option></select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-item" style="width:100%">Guardar</button>'+(nuevo?'':'<button class="btn" data-act="ask-del-item" style="width:100%;margin-top:8px">Eliminar</button>')+'<button class="btn" data-act="edit-plan" style="width:100%;margin-top:8px">Volver</button>');
+  sheet('<h3>'+(nuevo?'Nuevo pago':'Editar pago')+'</h3><div class="f"><label for="i-nombre">Nombre</label><input id="i-nombre" value="'+esc(p.nombre)+'" placeholder="Leche, Huevos, Hielo…"></div><div class="f2"><div class="f"><label for="i-dia">Día</label><select id="i-dia">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(d===p.dia?' selected':'')+'>'+esc(DIAS[d])+'</option>'}).join('')+'</select></div><div class="f"><label for="i-monto">Monto</label><input id="i-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div></div><div class="f"><label for="i-tipo">Tipo</label><select id="i-tipo"><option value="compras"'+(p.tipo==='compras'?' selected':'')+'>Compras del negocio</option><option value="nomina"'+(p.tipo==='nomina'?' selected':'')+'>Nómina</option></select></div><div class="f2"><div class="f"><label for="i-medio">Medio de pago</label><select id="i-medio">'+medioOpts(p.medio)+'</select></div><div class="f"><label for="i-dato">Cuenta / llave</label><input id="i-dato" value="'+esc(p.dato||'')+'" placeholder="Número o nombre"></div></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-item" style="width:100%">Guardar</button>'+(nuevo?'':'<button class="btn" data-act="ask-del-item" style="width:100%;margin-top:8px">Eliminar</button>')+'<button class="btn" data-act="edit-plan" style="width:100%;margin-top:8px">Volver</button>');
 }
 function saveItem(){
   var n=$('i-nombre').value.trim(),err=$('errline');if(!n){err.textContent='Escribe el nombre.';return}
   var v=parseMonto($('i-monto').value);
-  var o={nombre:n,dia:Number($('i-dia').value),tipo:$('i-tipo').value,monto:isNaN(v)?0:v};
+  var o={nombre:n,dia:Number($('i-dia').value),tipo:$('i-tipo').value,monto:isNaN(v)?0:v,medio:$('i-medio').value,dato:$('i-dato').value.trim()};
   if(IT<0){o.key='x'+Date.now().toString(36);S.cfg.semana.push(o)}
-  else{var p=S.cfg.semana[IT];p.nombre=o.nombre;p.dia=o.dia;p.tipo=o.tipo;p.monto=o.monto}
+  else{var p=S.cfg.semana[IT];p.nombre=o.nombre;p.dia=o.dia;p.tipo=o.tipo;p.monto=o.monto;p.medio=o.medio;p.dato=o.dato}
   saveCfg().then(function(){render();openPlan()});
 }
 function ajustar(){
@@ -445,6 +448,8 @@ document.addEventListener('change',function(e){
   else if(c==='movbol'){$('m-cat').innerHTML=catOpts(F.tipo,el.value)}
   else if(el.dataset.cfg){var v=parseMonto(el.value);S.cfg[el.dataset.cfg][Number(el.dataset.i)].monto=isNaN(v)?0:v;saveCfg()}
   else if(el.dataset.cfgf!==undefined){S.cfg.fijos[Number(el.dataset.cfgf)].frecuencia=el.value;saveCfg().then(render)}
+  else if(el.dataset.cfgmedio!==undefined){S.cfg.fijos[Number(el.dataset.cfgmedio)].medio=el.value;saveCfg()}
+  else if(el.dataset.cfgdato!==undefined){S.cfg.fijos[Number(el.dataset.cfgdato)].dato=el.value.trim();saveCfg()}
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
 
