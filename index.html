@@ -141,7 +141,7 @@ function medioOpts(sel){return MEDIOS.map(function(m){return '<option value="'+m
 function medioLbl(v){var m=MEDIOS.filter(function(x){return x[0]===v})[0];return m?m[1]:''}
 
 /* ---------- state ---------- */
-var S={db:null,dbChecked:false,movs:[],pagos:{},cfg:JSON.parse(JSON.stringify(DEF_CFG)),tab:'hoy',week:0,mes:null,fAmb:'todo',fBol:'todo',pendDel:null};
+var S={db:null,dbChecked:false,movs:[],pagos:{},nomina:{},cfg:JSON.parse(JSON.stringify(DEF_CFG)),tab:'hoy',week:0,mes:null,fAmb:'todo',fBol:'todo',pendDel:null};
 var $=function(id){return document.getElementById(id)};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function hoy(){return new Date(Date.now()-5*3600*1000).toISOString().slice(0,10)}
@@ -366,7 +366,9 @@ function openPago(d){
   if(d.fijo){var f=S.cfg.fijos.filter(function(x){return x.key===d.fijo})[0];p={key:f.key,nombre:f.nombre,tipo:'nomina',monto:f.monto,medio:f.medio,dato:f.dato};id='fijo_'+f.key+'_'+d.per;fecha=hoy();titulo=f.nombre+' · '+d.per}
   else{p=S.cfg.semana.filter(function(x){return x.key===d.key})[0];id=d.fecha+'_'+p.key;fecha=d.fecha;titulo=p.nombre+' · '+fDia(d.fecha,true)}
   PG={id:id,p:p};
-  sheet('<h3>Marcar pagado</h3><p class="hint" style="margin:-6px 0 12px">'+esc(titulo)+(p.medio?' · '+esc(medioLbl(p.medio))+(p.dato?' · '+esc(p.dato):''):'')+'</p><div class="f2"><div class="f"><label for="p-monto">Monto pagado</label><input id="p-monto" inputmode="decimal" value="'+(p.monto||'')+'" placeholder="0"></div><div class="f"><label for="p-fecha">Fecha del pago</label><input id="p-fecha" type="date" value="'+(d.fijo?hoy():fecha)+'"></div></div><div class="f"><label for="p-desde">Pagado desde</label><select id="p-desde">'+bolsOpts('negocio','caja')+'</select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-pago" style="width:100%">Confirmar pago</button>');
+  var auto=S.nomina[p.key],montoIni=p.monto,autoLine='';
+  if(auto&&auto.monto>0){montoIni=auto.monto;autoLine='<p class="hint" style="margin:0 0 12px;color:var(--accent)">🔗 Calculado desde Horarios: '+(auto.horas?auto.horas.toFixed(1)+'h · ':'')+(auto.periodo?esc(auto.periodo)+' · ':'')+'revisa antes de confirmar</p>'}
+  sheet('<h3>Marcar pagado</h3><p class="hint" style="margin:-6px 0 12px">'+esc(titulo)+(p.medio?' · '+esc(medioLbl(p.medio))+(p.dato?' · '+esc(p.dato):''):'')+'</p>'+autoLine+'<div class="f2"><div class="f"><label for="p-monto">Monto pagado</label><input id="p-monto" inputmode="decimal" value="'+(montoIni||'')+'" placeholder="0"></div><div class="f"><label for="p-fecha">Fecha del pago</label><input id="p-fecha" type="date" value="'+(d.fijo?hoy():fecha)+'"></div></div><div class="f"><label for="p-desde">Pagado desde</label><select id="p-desde">'+bolsOpts('negocio','caja')+'</select></div><div class="err" id="errline"></div><button class="btn pri" data-act="save-pago" style="width:100%">Confirmar pago</button>');
 }
 function savePagoForm(){
   var v=parseMonto($('p-monto').value),err=$('errline'),p=PG.p;if(!(v>0)){err.textContent='Escribe el monto pagado.';return}
@@ -475,6 +477,7 @@ function start(){
   S.db.collection('movs').onSnapshot(function(q){S.movs=q.docs.map(function(d){return Object.assign({id:d.id},d.data())});render()},dbErr);
   S.db.collection('pagos').onSnapshot(function(q){var p={};q.docs.forEach(function(d){p[d.id]=d.data()});S.pagos=p;render()},dbErr);
   S.db.doc('config/nomina').onSnapshot(function(s){if(s.exists){var c=s.data();if(c.semana&&c.fijos){S.cfg=JSON.parse(JSON.stringify(c))}}render()},dbErr);
+  S.db.collection('nomina_calculada').onSnapshot(function(q){var n={};q.docs.forEach(function(d){n[d.id]=d.data()});S.nomina=n;render()},dbErr);
 }
 function boot(){
   if(!FIREBASE_CONFIG.apiKey){setupScreen();return}
